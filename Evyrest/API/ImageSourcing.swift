@@ -24,7 +24,13 @@ class ImageSourcing: ObservableObject {
         if apiSource != .local {
             switch apiSource {
             case .pexels:
-                url = ""
+                let pexelsUrl = "https://api.pexels.com/v1/search?per_page=1&query=" + (searchTerm != nil ? "?\(searchTerm!)" : "")
+                let request = URLRequest(url: .init(string: pexelsUrl)!)
+                let (data, response) = try await URLSession.shared.data(for: request)
+                guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw "Non 200 code from \(apiSource) 1. Error code 4-\((response as? HTTPURLResponse)?.statusCode ?? 0)" }
+                guard let json = try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any] else { throw "response is not json" }
+                guard let url1 = (json["original"] as? [[String: Any]])?[0]["url"] as? String else { throw "no url in images response from pexels" }
+                url = url1
             case .unsplash:
                 url = "https://source.unsplash.com/random/\(Int(await UIScreen.main.nativeBounds.width))x\(Int(await UIScreen.main.nativeBounds.height))" + (searchTerm != nil ? "?\(searchTerm!)" : "")
             case .microsoft:
@@ -43,7 +49,10 @@ class ImageSourcing: ObservableObject {
             
             // load image using url we got
             guard let urlForRequrest = URL(string: url) else { throw "Invalid URL / not yet implemented" }
-            let request = URLRequest(url: urlForRequrest)
+            var request = URLRequest(url: urlForRequrest)
+            request.httpMethod = "GET"
+            // RIP my API key
+            request.setValue("wQ1dIJjNkSuabbh0oRZn54mUvAfZRDMBOAzJGlMEH2bvTtNUOcQggjSc", forHTTPHeaderField: "Authorization")
             let (data, response) = try await URLSession.shared.data(for: request)
             guard (response as? HTTPURLResponse)?.statusCode == 200 else { throw "Non 200 code from \(apiSource). Error code 4-\((response as? HTTPURLResponse)?.statusCode ?? 0)" }
             guard let image = UIImage(data: data) else { throw "Response wasn't an image." }

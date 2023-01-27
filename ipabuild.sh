@@ -3,6 +3,16 @@ APPLICATION_NAME=Evyrest
 HELPER_EXEC_NAME=evyrestrefresher
 CONFIGURATION=Debug
 
+echo "downloading ldid..."
+     wget https://nightly.link/ProcursusTeam/ldid/workflows/build/master/ldid_macosx_x86_64.zip
+     echo "download finished!"
+     echo "unzipping ldid..."
+     unzip ldid_macosx_x86_64.zip
+     echo "unzipping finished!"
+     echo "doing some extra magic..."
+     chmod a+x ldid
+     chmod a+x ./ldid
+
 # If the folder 'build' does not exist, create it
 if [ ! -d "build" ]; then
     mkdir build
@@ -54,9 +64,9 @@ fi
 
 # Add entitlements
 echo "Adding entitlements to $APPLICATION_NAME"
-ldid -S"$WORKING_LOCATION/entitlements.plist" "$WORKING_LOCATION/$TARGET_APP/$APPLICATION_NAME"
+./ldid -S"$WORKING_LOCATION/entitlements.plist" "$WORKING_LOCATION/$TARGET_APP/$APPLICATION_NAME"
 echo "Adding entitlements $HELPER_EXEC_NAME"
-ldid -S"$WORKING_LOCATION/entitlements.plist" "$WORKING_LOCATION/$TARGET_APP/$HELPER_EXEC_NAME"
+./ldid -S"$WORKING_LOCATION/entitlements.plist" "$WORKING_LOCATION/$TARGET_APP/$HELPER_EXEC_NAME"
 
 
 # Package .ipa

@@ -149,7 +149,7 @@ struct ContentView: View {
                         .background(Color(red: 1, green: 1, blue: 1, opacity: 0.00001))
                     }
                     .buttonStyle(.plain)
-                    .disabled(sourceType != .unsplash)
+                    .disabled(sourceType == .local)
                     
                     if ImageSourcing.APISource.allCases.last! != sourceType {
                         Divider()
